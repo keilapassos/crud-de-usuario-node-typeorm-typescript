@@ -1,4 +1,4 @@
-import { getRepository, getCustomRepository } from "typeorm";
+import { getRepository } from "typeorm";
 import { User } from "../entities";
 
 import UserRepository from '../repositories/userRepository';
@@ -27,17 +27,10 @@ export const createUser = async (body: UserBody) => {
     return user;
 }
 
-// export const currentUser = async (req: Request, res: Response) => {
-//     const user = req.user;
+export const listUser = async () => {
+    const userRepository = getRepository(User);
 
-//     res.send(user);
-// }
+    const users = await userRepository.find();
 
-
-// export const listUser = async (page = 1) => {
-//     const userRepository = getCustomRepository(UserRepository);
-
-//     const users = await userRepository.findPaginated(page);
-
-//     return users;
-// }
+    return users;
+}

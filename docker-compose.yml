@@ -11,7 +11,8 @@ services:
       - PG_DB=entrega5
       - PG_USER=postgres
       - PG_HOST=db
-      - SECRET=qualquerCoisa
+      - SECRET=mysecretkey
+      - EXPIRESIN=1d
     volumes:
       - .:/code 
 

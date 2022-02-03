@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createUser } from "../services/user.service"
+import { createUser, listUser } from "../services/user.service"
 
 export const create = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -8,16 +8,13 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
     } catch (error) {
         return next(error);
     }
-
-
 }
 
-// export const list = async (req: Request, res: Response) => {
-//     const pageQuery = req.query.page ? parseInt(req.query.page as string) : 1;
-//     const users = await listUser(pageQuery);
+export const list = async (req: Request, res: Response) => {
+    const users = await listUser();
 
-//     res.send(users);
-// }
+    res.send(users);
+}
 
 // export const currentUser = async (req: Request, res: Response) => {
 //     const user = req.user;

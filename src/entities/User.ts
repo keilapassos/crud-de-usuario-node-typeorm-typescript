@@ -6,25 +6,25 @@ export default class User {
     @PrimaryGeneratedColumn('uuid')
     uuid!: string;
 
+    // @Column({nullable: true})
     @Column()
     name!: string;
 
     @Column({ unique: true })
+    // @Column()
     email!: string;
 
     @Column()
     password!: string;
 
+    // @Column({nullable: true})
     @Column()
     isAdm!: boolean;
 
-    // @BeforeInsert()
-    // hashPassword() {
-    //     this.password = bcrypt.hashSync(this.password, 10);
-    // }    
-
-    // @Column()
-    // createdOn!: Date;
+    @BeforeInsert()
+    hashPassword() {
+        this.password = bcrypt.hashSync(this.password, 10);
+    }    
 
     @Column()
     createdOn!: Date;
@@ -40,9 +40,7 @@ export default class User {
     @BeforeInsert()
     updateHour(){
         this.updatedOn = new Date();
-    }
-
-    
+    }    
     
 }
 
