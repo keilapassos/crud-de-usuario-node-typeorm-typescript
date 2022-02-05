@@ -13,6 +13,13 @@ class UserRepository extends Repository<User> {
         return user;
     }
 
+    public async findByUuid(uuid: string): Promise<User | undefined> {
+        const user = await this.findOne({
+            uuid
+        });
+        return user;
+    }
+
 }
 
 export default UserRepository;

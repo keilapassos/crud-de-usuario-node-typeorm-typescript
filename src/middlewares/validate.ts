@@ -10,7 +10,7 @@ export const validate = (schema: yup.AnyObjectSchema) => async (req: Request, re
         await schema.validate(body, { abortEarly: false, stripUnknown: true });
         next();
     } catch (e) {
-        // next(new AppError({ [(e as any).name]: (e as any).errors }, 400));
         console.log(e)
+       return { [(e as any).name]: (e as any).errors };
     }
 }
