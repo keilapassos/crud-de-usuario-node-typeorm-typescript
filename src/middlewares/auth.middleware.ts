@@ -1,8 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 
-// import AppError from '../errors/AppError';
-
 
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
  

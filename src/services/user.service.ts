@@ -12,14 +12,10 @@ interface UserBody {
 }
 
 export const createUser = async (body: UserBody) => {
+    
     const password = await bcrypt.hash(body.password, 10);
 
-    const { name, email, isAdm } = body;
-
-    // const hashedPassword = await bcrypt.hash(password, 10);
-
-    // password = hashedPassword
-    
+    const { name, email, isAdm } = body;    
     
     const userRepository = getRepository(User);
 
