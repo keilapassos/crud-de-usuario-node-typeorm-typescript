@@ -1,4 +1,4 @@
-import { getCustomRepository, getRepository } from "typeorm";
+import { getCustomRepository, getRepository, QueryFailedError } from "typeorm";
 import { User } from "../entities";
 import UserRepository from "../repositories/userRepository";
 import bcrypt from 'bcrypt'
@@ -63,18 +63,28 @@ export const updateUser = async (uuidParams: string, reqUser: any, data: any) =>
     const userFounded = await userCustomRepository.findByUuid(reqUser)
 
     const userRepository = getRepository(User);
-    const userExists = await userRepository.findOne(uuidParams)
 
-    if (!userExists){
-        return {message: "User not found"}
+    try{
+
+        const userExists = await userRepository.findOne(uuidParams)
+
+        if (!userExists){
+            return {message: "User not found"}
+        }
+    
+        if (userFounded?.isAdm || userFounded?.uuid === uuidParams){ 
+    
+            return await userCustomRepository.save({
+                ...userExists, ...data
+            });
+        }   
+        
+    }catch(err){
+        if(QueryFailedError){
+            return err
+        }
     }
 
-    if (userFounded?.isAdm || userFounded?.uuid === uuidParams){ 
-
-        return await userCustomRepository.save({
-            ...userExists, ...data
-        });
-    }
 }
 
 export const deleteUser = async (uuidParams: string, reqUser: any, next:any) => {
@@ -84,16 +94,23 @@ export const deleteUser = async (uuidParams: string, reqUser: any, next:any) => 
     const userFounded = await userCustomRepository.findByUuid(reqUser)
 
     const userRepository = getRepository(User);
-    const userExists = await userRepository.findOne(uuidParams)
 
-    if (!userExists){
-        return {message: "User not found"}
-    }
+    try{
+        const userExists = await userRepository.findOne(uuidParams)
 
-    if (userFounded?.isAdm || userFounded?.uuid === uuidParams){ 
+        if (!userExists){
+            return {message: "User not found"}
+        }
 
-        await userCustomRepository.delete(uuidParams); 
-        return {message: "User deleted with success"} 
-    }
+        if (userFounded?.isAdm || userFounded?.uuid === uuidParams){ 
+
+            await userCustomRepository.delete(uuidParams); 
+            return {message: "User deleted with success"} 
+        }    
+    }catch(err){
+        if(QueryFailedError){
+            return {message: QueryFailedError}
+        }
+    }    
 }
 

@@ -12,8 +12,8 @@ export const userRouter = () => {
     router.post('', validate(createUserSchema), create);
     router.get('', isAuthenticated, adminMiddleware, list);
     router.get('/profile', isAuthenticated, currentUser);
-    router.patch('/:uuid', isAuthenticated, validate(updateUserSchema), updating);
-    router.delete('/:uuid', isAuthenticated, deleting);
+    router.patch('/:uuid', isAuthenticated, adminMiddleware, validate(updateUserSchema), updating);
+    router.delete('/:uuid', isAuthenticated, adminMiddleware, deleting);
 
     return router;
 }

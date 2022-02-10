@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { createUser, listUser, updateUser, deleteUser } from "../services/user.service"
-import { getRepository } from "typeorm";
+import { getRepository, QueryFailedError } from "typeorm";
 import { User } from "../entities";
 import bcrypt from 'bcrypt'
 
@@ -44,6 +44,7 @@ export const currentUser = async (req: Request, res: Response) => {
 }
 
 export const updating = async (req: Request, res: Response) => {
+
     const uuid = req.user
     const uuidParams = req.params.uuid
 
@@ -51,12 +52,16 @@ export const updating = async (req: Request, res: Response) => {
         req.body.password = await bcrypt.hash(req.body.password, 10);
     }
 
-    let updated = await updateUser(uuidParams, uuid, req.body);
-        
-    if(updated?.message === 'User not found'){
-        return res.status(404).send(updated);
+    if (req.body?.isAdm){
+        return res.status(400).send({message: "isAdm field can not be changed"})
     }
 
+    let updated = await updateUser(uuidParams, uuid, req.body);
+
+        
+    if (updated?.message === 'User not found'){
+        return res.status(404).send(updated);
+    }
 
     if (updated){
         const userWithoutPassword = {
@@ -71,6 +76,10 @@ export const updating = async (req: Request, res: Response) => {
         return res.send(userWithoutPassword);
     }
 
+    if (updated.message.includes('invalid input syntax for type uuid')){
+        return res.status(400).send({message: "Invalid UUID"})
+    }
+
     return res.status(401).send({message: "Missing admin permissions"})       
 }
 
@@ -80,12 +89,16 @@ export const deleting = async (req: Request, res: Response, next: NextFunction) 
 
     let deleted = await deleteUser(uuidParams, uuid, next);
 
-    if(deleted?.message === 'User deleted with success'){
+    if (deleted?.message === 'User deleted with success'){
         return res.status(200).send(deleted);
     }
 
-    if(deleted?.message === 'User not found'){
+    if (deleted?.message === 'User not found'){
         return res.status(404).send(deleted);
+    }
+
+    if (QueryFailedError){
+        return res.status(400).send({message: "Invalid UUID"})
     }
 
     return res.status(401).send({message: "Missing admin permissions"})
